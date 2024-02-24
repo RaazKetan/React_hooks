@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 import Tasks from "./components/Tasks/Tasks";
 import NewTask from "./components/NewTask/NewTask";
@@ -6,7 +6,7 @@ import useHttp from "./components/hooks/use-http";
 
 function App() {
   const [tasks, setTasks] = useState([]);
-  const transformTasks = (taskObj) => {
+  const transformTasks = useCallback((taskObj) => {
     const loadedTasks = [];
 
     for (const taskKey in taskObj) {
@@ -14,18 +14,15 @@ function App() {
     }
 
     setTasks(loadedTasks);
-  };
+  }, []);
   const httpData = useHttp(
     { url: "https://react-http-aa161-default-rtdb.firebaseio.com//tasks.json" },
     transformTasks
   );
-  const { 
-    isLoading, 
-    error, 
-    sendRequest: fetchTasks
-  } = httpData;
+  const { isLoading, error, sendRequest: fetchTasks } = httpData;
 
- 
+  //for the moment, useEffect is not taking any dependencies like fetchTasks because it is not a function that will change, it is a function that will be called once and that's it
+  //if we call fecthTasks inside useEffect, it will create an infinite loop
   useEffect(() => {
     fetchTasks();
   }, []);
